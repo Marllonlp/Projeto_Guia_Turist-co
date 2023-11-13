@@ -9,6 +9,7 @@ public class Projeto_Guia_Turistico {
         Scanner sc = new Scanner(System.in);
         int opcao = 0;
         while (opcao != 6) {
+            System.out.println("gggg");
             System.out.println("\n|----------------------|");
             System.out.println("  Cavernas do Peruaçu  ");
             System.out.println("|----------------------|\n");
