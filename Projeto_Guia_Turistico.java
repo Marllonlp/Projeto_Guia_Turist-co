@@ -1,34 +1,33 @@
+import java.io.*;
+import java.nio.file.*;
+import java.util.List;
 import java.util.Scanner;
+
 
 public class Projeto_Guia_Turistico {
     public static void main(String[] args) {
-        menu();
 
-    }
-    private static void menu() {
+        String path = "clientes/";
+        int id = 0;
+        id = inicializar(path);
         Scanner sc = new Scanner(System.in);
+        Clientes cl = new Clientes();
+
         int opcao = 0;
         while (opcao != 6) {
-            System.out.println("\n|----------------------|");
-            System.out.println("  Cavernas do Peruaçu  ");
-            System.out.println("|----------------------|\n");
-            System.out.println(" 1 - Cadastrar Usuario ");
-            System.out.println(" 2 - Reservar Caverna ");
-            System.out.println(" 3 - Verificar Reserva ");
-            System.out.println(" 4 - Cancelar Reserva ");
-            System.out.println(" 5 - Pacotes Disponiveis ");
-
-            System.out.println(" 6 - Sair ");
-            System.out.print("\n Opção: ");
-
+            menu();
             opcao = sc.nextInt();
 
             switch (opcao) {
                 case 1:
-                    cadastrarUsuario();
+                    if (cadastrarUsuario(id, path)) {
+                        id++;
+                        gravarId(id);
+                    };
                     break;
                 case 2:
-                    reservaCaverna();
+                    id = 0;
+                    reservaCaverna(id);
                     break;
                 case 3:
                     verificarReserva();
@@ -47,26 +46,130 @@ public class Projeto_Guia_Turistico {
                     System.out.println(" Opção Invalida! ");
             }
         }
+
+
     }
 
-//Metodo de Cadastramento do Usuario
-    private static void cadastrarUsuario() {
-        System.out.println("Sucesso");
+    private static void menu() {
+
+        System.out.println("\n|----------------------|");
+        System.out.println("  Cavernas do Peruaçu  ");
+        System.out.println("|----------------------|\n");
+        System.out.println(" 1 - Cadastrar Usuario ");
+        System.out.println(" 2 - Fazer Reserva ");
+        System.out.println(" 3 - Verificar Reserva ");
+        System.out.println(" 4 - Cancelar Reserva ");
+        System.out.println(" 5 - Pacotes Disponiveis ");
+
+        System.out.println(" 6 - Sair ");
+        System.out.print("\n Opção: ");
+
     }
-    //Metodo de Cadastramento do Usuario
-    private static void reservaCaverna() {
+
+
+    private static boolean cadastrarUsuario(int id, String path) {
+        Scanner sc = new Scanner(System.in);
+        Clientes cl = new Clientes();
+
+        System.out.println("CADASTRAR: ");
+        System.out.println("CPF: ");
+        cl.cpf = sc.nextLine();
+        System.out.println("SENHA: ");
+        cl.senha = sc.nextLine();
+        cl.id=id;
+        try {
+            gravarCliente(cl, path);
+        } catch (FileNotFoundException e) {
+            System.out.println("Não foi possivel cadastrar: ");
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+
+    }
+
+    private static void gravarCliente(Clientes cl, String path) throws FileNotFoundException {
+        PrintWriter pw = new PrintWriter(path + cl.id + ".txt");
+        pw.println(cl.id);
+        pw.println(cl.cpf);
+        pw.println(cl.senha);
+        pw.flush();
+        pw.close();
+    }
+
+
+
+    private static void gravarId(int id) {
+        PrintWriter pw;
+        try {
+            pw = new PrintWriter("id.txt");
+            pw.println(id);
+            pw.flush();
+            pw.close();
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private static int inicializar(String path) {
+        int id = 0;
+        File dir=new File(path);
+        if(!dir.exists()) { 			//Verifica se o diretório contendo contatos ja existe
+            dir.mkdir(); 				//cria se não existir
+        }
+        File arquivo = new File("id.txt");
+        if(!arquivo.exists()) { 		//verifica se o arquivo de id já existe
+            try {
+                arquivo.createNewFile(); //cria se não existir
+            } catch (IOException e) {
+                System.out.println("Não foi possível criar o ID");
+                e.printStackTrace();
+            }
+            gravarId(0); 				//grava o id=0 para inicializar a agenda
+        }else { 						//caso o arquivo de id já exista,
+            id=lerId(); 			//é feita a leitura
+        }
+        return id;
+    }
+    private static int lerId() {
+        BufferedReader bf;
+        int id=0;
+        try {
+            bf = new BufferedReader(new FileReader("id.txt"));
+            id = Integer.parseInt(bf.readLine());
+            bf.close();
+        } catch (IOException | NumberFormatException e) {
+            System.err.println("Id não encontrado");
+            e.printStackTrace();
+        }
+        return id;
+    }
+    private static void verificarReserva () {
         System.out.println("Sucesso");
     }
 
-    private static void verificarReserva() {
+    private static void cancelarReserva () {
         System.out.println("Sucesso");
     }
 
-    private static void cancelarReserva() {
+    private static void pacotesDisponivel () {
         System.out.println("Sucesso");
     }
-    private static void pacotesDisponivel() {
-        System.out.println("Sucesso");
+
+    private static boolean reservaCaverna(int id) {
+        Scanner sc = new Scanner(System.in);
+        Clientes c = new Clientes();
+        System.out.println("|-------------------|");
+        System.out.println(" Reservando Passeio ");
+        System.out.println("|-------------------|\n");
+        // Colocar data e hora
+        System.out.print("Adultos: ");
+        c.adultos = sc.nextInt();
+        System.out.print("Crianças: ");
+        c.criancas = sc.nextInt();
+        c.id = id;
+
+        return false;
     }
 }
-
