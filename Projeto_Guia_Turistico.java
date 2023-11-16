@@ -4,11 +4,14 @@ public class Projeto_Guia_Turistico {
     public static void main(String[] args) {
         Scanner ler = new Scanner(System.in);
         int opcao = 0;
+        String path = "clientes/";
+        int id = 0;
         menu();
+
         opcao = ler.nextInt();
         switch (opcao) {
             case 1:
-                menuUsuario();
+                menuCadastro(id, path);
                 break;
             case 2:
                 validarAdmin();
@@ -26,10 +29,12 @@ public class Projeto_Guia_Turistico {
         Scanner sc = new Scanner(System.in);
         Clientes cl = new Clientes();
 
-        System.out.println("CADASTRAR: ");
-        System.out.println("CPF: ");
+        System.out.println("|-----------|");
+        System.out.println("  Cadastrar  ");
+        System.out.println("|-----------|\n");
+        System.out.print("E-mail: ");
         cl.email = sc.nextLine();
-        System.out.println("SENHA: ");
+        System.out.print("Senha: ");
         cl.senha = sc.nextLine();
         cl.id = id;
         try {
@@ -68,21 +73,21 @@ public class Projeto_Guia_Turistico {
     // Método para inicializar o programa e ler o id inicial
     private static int inicializar(String path) {
         int id = 0;
-        File dir = new File(path);
-        if (!dir.exists()) {
-            dir.mkdir();
+        File dir=new File(path);
+        if(!dir.exists()) { 			//Verifica se o diretório contendo contatos ja existe
+            dir.mkdir(); 				//cria se não existir
         }
         File arquivo = new File("id.txt");
-        if (!arquivo.exists()) {
+        if(!arquivo.exists()) { 		//verifica se o arquivo de id já existe
             try {
-                arquivo.createNewFile();
+                arquivo.createNewFile(); //cria se não existir
             } catch (IOException e) {
                 System.out.println("Não foi possível criar o ID");
                 e.printStackTrace();
             }
-            gravarId(0);
-        } else {
-            id = lerId();
+            gravarId(0); 				//grava o id=0 para inicializar a agenda
+        }else { 						//caso o arquivo de id já exista,
+            id=lerId(); 			    //é feita a leitura
         }
         return id;
     }
@@ -103,12 +108,12 @@ public class Projeto_Guia_Turistico {
     }
 
     // Método para verificar reservas
-    private static void verificarReserva() {
+    private static void verificarPasseio() {
         System.out.println("Sucesso");
     }
 
     // Método para cancelar reservas
-    private static void cancelarReserva() {
+    private static void cancelarPasseio() {
         System.out.println("Sucesso");
     }
 
@@ -118,7 +123,7 @@ public class Projeto_Guia_Turistico {
     }
 
     // Método para lidar com reservas de cavernas
-    private static boolean reservaCaverna(int id) {
+    private static boolean reservaPasseio(int id) {
         Scanner sc = new Scanner(System.in);
         Clientes c = new Clientes();
         System.out.println("|-------------------|");
@@ -137,32 +142,28 @@ public class Projeto_Guia_Turistico {
     private static void menu() {
         System.out.println("\n|----------------------|");
         System.out.println("  Cavernas do Peruaçu  ");
-        System.out.println("|----------------------|");
-        System.out.println(" Entar como: ");
-        System.out.println(" 1 - Usuario");
-        System.out.println(" 2 - Administrador");
-        System.out.println(" 3 - Encerrar");
+        System.out.println("|----------------------|\n");
+        System.out.println(" Entrar como: ");
+        System.out.println(" 1 - Usuario ");
+        System.out.println(" 2 - Administrador ");
+        System.out.println(" 3 - Encerrar\n");
         System.out.print("Opção:");
     }
 
-    private static void menuUsuario() {
-        String path = "clientes/";
-        int id = 0;
+    private static void menuCadastro(int id, String path) {
         id = inicializar(path);
         Scanner ler = new Scanner(System.in);
         Clientes cl = new Clientes();
         int opcao = 0;
 
-        while (opcao != 5) {
+        while (opcao != 3) {
             // Exibindo o menu
-            System.out.println("\n|----------------------|");
-            System.out.println("  Cavernas do Peruaçu  ");
-            System.out.println("|----------------------|\n");
+            System.out.println("\n|-------------------------|");
+            System.out.println("  Cadastramento ou Login ");
+            System.out.println("|---------------------------|\n");
             System.out.println(" 1 - Cadastrar Usuário ");
-            System.out.println(" 2 - Fazer Reserva ");
-            System.out.println(" 3 - Verificar Reserva ");
-            System.out.println(" 4 - Cancelar Reserva ");
-            System.out.println(" 5 - Sair ");
+            System.out.println(" 2 - Fazer Login ");
+            System.out.println(" 3 - Sair ");
             System.out.print("\n Opção: ");
             opcao = ler.nextInt();
 
@@ -177,17 +178,9 @@ public class Projeto_Guia_Turistico {
                 case 2:
                     // Opção 2: Reservar uma caverna
                     id = 0;
-                    reservaCaverna(id);
+                    loginUsuario();
                     break;
                 case 3:
-                    // Opção 3: Verificar reserva
-                    verificarReserva();
-                    break;
-                case 4:
-                    // Opção 4: Cancelar reserva
-                    cancelarReserva();
-                    break;
-                case 5:
                     // Opção 6: Sair do programa
                     System.out.println("Saindo...");
                     break;
@@ -196,6 +189,11 @@ public class Projeto_Guia_Turistico {
                     System.out.println(" Opção Inválida! ");
             }
         }
+
+    }
+
+    private static void loginUsuario() {
+        //Fazer login
     }
 
     private static void validarAdmin() {
@@ -204,7 +202,7 @@ public class Projeto_Guia_Turistico {
         System.out.println("Infome a senha do Administrado");
         int senha = ler.nextInt();
 
-        if (senha == senhaAdm.senhaAdmim) {
+        if (senha == senhaAdm.senhaAdmin) {
             menuAdmin();
         } else {
             System.out.println("Senha incorreta");
@@ -232,10 +230,10 @@ public class Projeto_Guia_Turistico {
             switch (opcao) {
                 case 1:
                     id = 0;
-                    reservaCaverna(id);
+                    reservaPasseio(id);
                     break;
                 case 2:
-                    verificarReserva();
+                    verificarPasseio();
                     break;
                 case 3:
                     confimarReserva();
