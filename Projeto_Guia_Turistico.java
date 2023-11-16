@@ -1,6 +1,4 @@
 import java.io.*;
-import java.nio.file.*;
-import java.util.List;
 import java.util.Scanner;
 
 
@@ -23,11 +21,12 @@ public class Projeto_Guia_Turistico {
                     if (cadastrarUsuario(id, path)) {
                         id++;
                         gravarId(id);
-                    };
+                    }
+                    ;
                     break;
                 case 2:
                     id = 0;
-                    reservaCaverna(id);
+                    reservaPasseio(id);
                     break;
                 case 3:
                     verificarReserva();
@@ -71,12 +70,16 @@ public class Projeto_Guia_Turistico {
         Scanner sc = new Scanner(System.in);
         Clientes cl = new Clientes();
 
-        System.out.println("CADASTRAR: ");
-        System.out.println("CPF: ");
-        cl.cpf = sc.nextLine();
-        System.out.println("SENHA: ");
+        System.out.println("|-----------|");
+        System.out.println("  Cadastrar ");
+        System.out.println("|-----------|\n");
+
+
+        System.out.println("Email: ");
+        cl.email = sc.nextLine();
+        System.out.println("Senha: ");
         cl.senha = sc.nextLine();
-        cl.id=id;
+        cl.id = id;
         try {
             gravarCliente(cl, path);
         } catch (FileNotFoundException e) {
@@ -91,12 +94,11 @@ public class Projeto_Guia_Turistico {
     private static void gravarCliente(Clientes cl, String path) throws FileNotFoundException {
         PrintWriter pw = new PrintWriter(path + cl.id + ".txt");
         pw.println(cl.id);
-        pw.println(cl.cpf);
+        pw.println(cl.email);
         pw.println(cl.senha);
         pw.flush();
         pw.close();
     }
-
 
 
     private static void gravarId(int id) {
@@ -114,27 +116,28 @@ public class Projeto_Guia_Turistico {
 
     private static int inicializar(String path) {
         int id = 0;
-        File dir=new File(path);
-        if(!dir.exists()) { 			//Verifica se o diretório contendo contatos ja existe
-            dir.mkdir(); 				//cria se não existir
+        File dir = new File(path);
+        if (!dir.exists()) {            //Verifica se o diretório contendo contatos ja existe
+            dir.mkdir();                //cria se não existir
         }
         File arquivo = new File("id.txt");
-        if(!arquivo.exists()) { 		//verifica se o arquivo de id já existe
+        if (!arquivo.exists()) {        //verifica se o arquivo de id já existe
             try {
                 arquivo.createNewFile(); //cria se não existir
             } catch (IOException e) {
                 System.out.println("Não foi possível criar o ID");
                 e.printStackTrace();
             }
-            gravarId(0); 				//grava o id=0 para inicializar a agenda
-        }else { 						//caso o arquivo de id já exista,
-            id=lerId(); 			//é feita a leitura
+            gravarId(0);                //grava o id=0 para inicializar a agenda
+        } else {                        //caso o arquivo de id já exista,
+            id = lerId();                //é feita a leitura
         }
         return id;
     }
+
     private static int lerId() {
         BufferedReader bf;
-        int id=0;
+        int id = 0;
         try {
             bf = new BufferedReader(new FileReader("id.txt"));
             id = Integer.parseInt(bf.readLine());
@@ -145,19 +148,20 @@ public class Projeto_Guia_Turistico {
         }
         return id;
     }
-    private static void verificarReserva () {
+
+    private static void verificarReserva() {
         System.out.println("Sucesso");
     }
 
-    private static void cancelarReserva () {
+    private static void cancelarReserva() {
         System.out.println("Sucesso");
     }
 
-    private static void pacotesDisponivel () {
+    private static void pacotesDisponivel() {
         System.out.println("Sucesso");
     }
 
-    private static boolean reservaCaverna(int id) {
+    private static boolean reservaPasseio(int id) {
         Scanner sc = new Scanner(System.in);
         Clientes c = new Clientes();
         System.out.println("|-------------------|");
