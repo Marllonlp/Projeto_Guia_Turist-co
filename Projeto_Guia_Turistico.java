@@ -5,6 +5,7 @@ public class Projeto_Guia_Turistico {
         Scanner ler = new Scanner(System.in);
         int opcao = 0;
         String path = "clientes/";
+        String caminhoReserva = "Reservas/";
         int id = 0;
         menu();
 
@@ -14,7 +15,7 @@ public class Projeto_Guia_Turistico {
                 menuCadastro(id, path);
                 break;
             case 2:
-                validarAdmin();
+                validarAdmin(id, caminhoReserva);
                 break;
             case 3:
                 System.out.println("Encerrando...");
@@ -50,9 +51,19 @@ public class Projeto_Guia_Turistico {
     // Método para gravar as informações do cliente em um arquivo
     private static void gravarCliente(Clientes cl, String path) throws FileNotFoundException {
         PrintWriter pw = new PrintWriter(path + cl.id + ".txt");
-        pw.println(cl.id);
-        pw.println(cl.email);
-        pw.println(cl.senha);
+        pw.println("Id do Usuario: "+cl.id);
+        pw.println("Email do Usuario: "+cl.email);
+        pw.println("Senha do Usuario: "+cl.senha);
+        pw.flush();
+        pw.close();
+    }
+    private static void gravarReserva(Clientes c, String caminhoReserva) throws FileNotFoundException {
+        PrintWriter pw = new PrintWriter(caminhoReserva + c.id + ".txt");
+        pw.println("Id do Usuario: "+c.id);
+        pw.println(" \nNome: "+c.nome);
+        pw.println(" \nContato: "+c.contato);
+        pw.println(" \nQuantidade de Adultos: "+c.adultos);
+        pw.println(" \nQuantidade de Crianças: "+c.criancas);
         pw.flush();
         pw.close();
     }
@@ -76,6 +87,26 @@ public class Projeto_Guia_Turistico {
         File dir=new File(path);
         if(!dir.exists()) { 			//Verifica se o diretório contendo contatos ja existe
             dir.mkdir(); 				//cria se não existir
+        }
+        File arquivo = new File("id.txt");
+        if(!arquivo.exists()) { 		//verifica se o arquivo de id já existe
+            try {
+                arquivo.createNewFile(); //cria se não existir
+            } catch (IOException e) {
+                System.out.println("Não foi possível criar o ID");
+                e.printStackTrace();
+            }
+            gravarId(0); 				//grava o id=0 para inicializar a agenda
+        }else { 						//caso o arquivo de id já exista,
+            id=lerId(); 			    //é feita a leitura
+        }
+        return id;
+    }
+    private static int inicializarReserva(String caminhoReserva) {
+        int id = 0;
+        File dir1 = new File(caminhoReserva);
+        if(!dir1.exists()) { 			//Verifica se o diretório contendo contatos ja existe
+            dir1.mkdir(); 				//cria se não existir
         }
         File arquivo = new File("id.txt");
         if(!arquivo.exists()) { 		//verifica se o arquivo de id já existe
@@ -123,20 +154,31 @@ public class Projeto_Guia_Turistico {
     }
 
     // Método para lidar com reservas de cavernas
-    private static boolean reservaPasseio(int id) {
+    private static boolean reservaPasseio(int id, String caminhoReserva) {
         Scanner sc = new Scanner(System.in);
         Clientes c = new Clientes();
         System.out.println("|-------------------|");
         System.out.println(" Reservando Passeio ");
         System.out.println("|-------------------|\n");
         // Inserir data e hora
+        System.out.print("Nome: ");
+        c.nome = sc.nextLine();
+        System.out.print("Contato: ");
+        c.contato = sc.nextLine();
         System.out.print("Adultos: ");
         c.adultos = sc.nextInt();
         System.out.print("Crianças: ");
         c.criancas = sc.nextInt();
         c.id = id;
 
-        return false;
+        try {
+            gravarReserva(c, caminhoReserva);
+        } catch (FileNotFoundException e) {
+            System.out.println("Não foi possível fazer Reserva: ");
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     private static void menu() {
@@ -153,7 +195,6 @@ public class Projeto_Guia_Turistico {
     private static void menuCadastro(int id, String path) {
         id = inicializar(path);
         Scanner ler = new Scanner(System.in);
-        Clientes cl = new Clientes();
         int opcao = 0;
 
         while (opcao != 3) {
@@ -196,23 +237,21 @@ public class Projeto_Guia_Turistico {
         //Fazer login
     }
 
-    private static void validarAdmin() {
+    private static void validarAdmin(int id, String caminhoReserva) {
         Scanner ler = new Scanner(System.in);
         Administrador senhaAdm = new Administrador();
         System.out.println("Infome a senha do Administrado");
         int senha = ler.nextInt();
 
         if (senha == senhaAdm.senhaAdmin) {
-            menuAdmin();
+            menuAdmin(id, caminhoReserva);
         } else {
             System.out.println("Senha incorreta");
         }
     }
 
-    private static void menuAdmin() {
-        String path = "clientes/";
-        int id = 0;
-        id = inicializar(path);
+    private static void menuAdmin(int id, String caminhoReserva) {
+        id = inicializarReserva(caminhoReserva);
         Scanner ler = new Scanner(System.in);
         int opcao = 0;
         while (opcao != 4) {
@@ -229,8 +268,10 @@ public class Projeto_Guia_Turistico {
 
             switch (opcao) {
                 case 1:
-                    id = 0;
-                    reservaPasseio(id);
+                    if (reservaPasseio(id, caminhoReserva)) {
+                        id++;
+                        gravarId(id);
+                    }
                     break;
                 case 2:
                     verificarPasseio();
