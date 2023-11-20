@@ -43,6 +43,8 @@ public class Projeto_Guia_Turistico {
         System.out.print("Senha: ");
         cl.senha = sc.nextLine();
         cl.id = id;
+
+        System.out.println("Cadastro Criado com Sucesso!");
         try {
             gravarCadastroCliente(cl, path);
         } catch (FileNotFoundException e) {
@@ -193,7 +195,7 @@ public class Projeto_Guia_Turistico {
                 case 2:
                     // Opção 2: Reservar uma caverna
                     id = 0;
-                    loginUsuario();
+                    loginUsuario(caminhoCadastro);
                     break;
                 case 3:
                     // Opção 6: Sair do programa
@@ -207,9 +209,46 @@ public class Projeto_Guia_Turistico {
 
     }
 
-    private static void loginUsuario() {
-        //Fazer login
+    private static boolean loginUsuario(String caminhoCadastro) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Informe o seu e-mail: ");
+        String email = sc.nextLine();
+        System.out.println("Informe a sua senha: ");
+        String senha = sc.nextLine();
+
+        File diretorio = new File(caminhoCadastro);
+        File[] arquivos = diretorio.listFiles();
+
+        if (arquivos != null) {
+            for (File arquivo : arquivos) {
+                try {
+                    BufferedReader bf = new BufferedReader(new FileReader(arquivo));
+                    String linha;
+                    String emailArquivo = "";
+                    String senhaArquivo = "";
+                    while ((linha = bf.readLine()) != null) {
+                        if (linha.contains("Email do Usuario: ")) {
+                            emailArquivo = linha.replace("Email do Usuario: ", "");
+                        }
+                        if (linha.contains("Senha do Usuario: ")) {
+                            senhaArquivo = linha.replace("Senha do Usuario: ", "");
+                        }
+                    }
+                    if (email.equals(emailArquivo) && senha.equals(senhaArquivo)) {
+                        System.out.println("Login realizado com sucesso!");
+                        return true;
+                    }
+                    bf.close();
+                } catch (IOException e) {
+                    System.err.println("Erro ao ler o arquivo");
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println("E-mail ou senha incorretos!");
+        return false;
     }
+
 
     private static void validarAdmin(int id, String caminhoReserva) {
         Scanner ler = new Scanner(System.in);
