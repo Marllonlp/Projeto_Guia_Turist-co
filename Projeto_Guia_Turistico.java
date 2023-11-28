@@ -14,11 +14,10 @@ public class Projeto_Guia_Turistico {
         int id = 0;
         int idR = 0;
         menu();
-
         opcao = ler.nextInt();
         switch (opcao) {
             case 1:
-                menuCadastro(id, path, caminhoCadastro, caminhoReserva, idR);
+                menuCadastroUsuario(id, path, caminhoCadastro, caminhoReserva, idR);
                 break;
             case 2:
                 validarAdmin(id, caminhoReserva, idR);
@@ -31,8 +30,80 @@ public class Projeto_Guia_Turistico {
         }
     }
 
+    // Métodos de inicialização
+    private static int inicializarGeral(String caminhoReserva) {
+        int id = 0;
+        File dir = new File(caminhoReserva);
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+
+        File arquivo = new File("id.txt");
+        if (!arquivo.exists()) {
+            try {
+                arquivo.createNewFile();
+            } catch (IOException e) {
+                System.out.println("Não foi possível criar o ID");
+                e.printStackTrace();
+            }
+            gravarId(id, "id.txt");
+        } else {
+            id = lerId("id.txt");
+        }
+        return id;
+    }
+
+    private static int inicializarReservas(String caminhoReserva) {
+        int idR = 0;
+        File dir = new File(caminhoReserva);
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+
+        File arquivo = new File("idR.txt");
+        if (!arquivo.exists()) {
+            try {
+                arquivo.createNewFile();
+            } catch (IOException e) {
+                System.out.println("Não foi possível criar o ID");
+                e.printStackTrace();
+            }
+            gravarId(idR, "idR.txt");
+        } else {
+            idR = lerId("idR.txt");
+        }
+        return idR;
+    }
+
+    private static void gravarId(int id, String arquivo) {
+        PrintWriter pw;
+        try {
+            pw = new PrintWriter(arquivo);
+            pw.println(id);
+            pw.flush();
+            pw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static int lerId(String arquivo) {
+        BufferedReader bf;
+        int id = 0;
+        try {
+            bf = new BufferedReader(new FileReader(arquivo));
+            id = Integer.parseInt(bf.readLine());
+            bf.close();
+        } catch (IOException | NumberFormatException e) {
+            System.err.println("Id não encontrado");
+            e.printStackTrace();
+        }
+        return id;
+    }
+
     // Métodos relacionados ao cadastro de usuários
     private static boolean cadastrarUsuario(int id, String path) {
+
         Scanner sc = new Scanner(System.in);
         Clientes cl = new Clientes();
 
@@ -112,75 +183,80 @@ public class Projeto_Guia_Turistico {
         return true;
     }
 
-    // Métodos relacionados à inicialização do programa e leitura de ID
-    private static void gravarId(int id, String arquivo) {
-        PrintWriter pw;
-        try {
-            pw = new PrintWriter(arquivo);
-            pw.println(id);
-            pw.flush();
-            pw.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
+    // Métodos relacionados à validação do administrador
+    private static void validarAdmin(int id, String caminhoReserva, int idR) {
+        Scanner ler = new Scanner(System.in);
+        Administrador senhaAdm = new Administrador();
+        System.out.println("Informe a senha do Administrador");
+        int senha = ler.nextInt();
 
-    private static int inicializarGeral(String caminhoReserva) {
-        int id = 0;
-        File dir = new File(caminhoReserva);
-        if (!dir.exists()) {
-            dir.mkdir();
-        }
-
-        File arquivo = new File("id.txt");
-        if (!arquivo.exists()) {
-            try {
-                arquivo.createNewFile();
-            } catch (IOException e) {
-                System.out.println("Não foi possível criar o ID");
-                e.printStackTrace();
-            }
-            gravarId(id, "id.txt");
+        if (senha == senhaAdm.senhaAdmin) {
+            menuAdmin(id, caminhoReserva, idR);
         } else {
-            id = lerId("id.txt");
+            System.out.println("Senha incorreta");
         }
-        return id;
     }
 
-    private static int inicializarReservas(String caminhoReserva) {
-        int idR = 0;
-        File dir = new File(caminhoReserva);
-        if (!dir.exists()) {
-            dir.mkdir();
-        }
+    private static boolean loginUsuario(String caminhoCadastro, int id, String caminhoReserva, int idR) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Informe o seu e-mail: ");
+        String email = sc.nextLine();
+        System.out.println("Informe a sua senha: ");
+        String senha = sc.nextLine();
 
-        File arquivo = new File("idR.txt");
-        if (!arquivo.exists()) {
-            try {
-                arquivo.createNewFile();
-            } catch (IOException e) {
-                System.out.println("Não foi possível criar o ID");
-                e.printStackTrace();
+        File diretorio = new File(caminhoCadastro);
+        File[] arquivos = diretorio.listFiles();
+        if (arquivos != null) {
+            for (File arquivo : arquivos) {
+                try {
+                    BufferedReader bf = new BufferedReader(new FileReader(arquivo));
+                    String linha;
+                    String emailArquivo = "";
+                    String senhaArquivo = "";
+                    while ((linha = bf.readLine()) != null) {
+                        if (linha.contains("Email do Usuario: ")) {
+                            emailArquivo = linha.replace("Email do Usuario: ", "");
+
+                        }
+                        if (linha.contains("Senha do Usuario: ")) {
+                            senhaArquivo = linha.replace("Senha do Usuario: ", "");
+                        }
+
+                    }
+                    if (email.equals(emailArquivo) && senha.equals(senhaArquivo)) {
+                        System.out.println("Login realizado com sucesso!");
+                        menuUsuario(id, caminhoReserva, idR);
+                        return true;
+                    }
+                    bf.close();
+                } catch (IOException e) {
+                    System.err.println("Erro ao ler o arquivo");
+                    e.printStackTrace();
+                }
             }
-            gravarId(idR, "idR.txt");
-        } else {
-            idR = lerId("idR.txt");
+
         }
-        return idR;
+        System.out.println("E-mail ou senha incorretos!");
+        return false;
     }
 
-    private static int lerId(String arquivo) {
-        BufferedReader bf;
-        int id = 0;
-        try {
-            bf = new BufferedReader(new FileReader(arquivo));
-            id = Integer.parseInt(bf.readLine());
-            bf.close();
-        } catch (IOException | NumberFormatException e) {
-            System.err.println("Id não encontrado");
-            e.printStackTrace();
-        }
-        return id;
+    private static void confimarReserva() {
+        // Implementar método de confirmação de reserva
+    }
+
+    private static void verificarPasseio() {
+        // Implementar método de verificação de reserva
+    }
+
+    private static void cancelarReserva() {
+        // Implementar método de cancelamento de reserva
+    }
+
+    private static void informacaoSobreParque() {
+        System.out.println("\n|-------------------------|");
+        System.out.println("  CAVERNAS DO PERUAÇU");
+        System.out.println("|---------------------------|\n");
+        System.out.println("O Parque Nacional Cavernas do Peruaçu é um local onde belas paisagens são emolduradas pela arte rupestre pré-histórica, em sítios arqueológicos milenares de importância internacional e suas cavernas de grandeza colossal.\n" + "\n" + "A Unidade de Conservação foi criada em 1999, e possui uma área de 56.448 hectares, que compreende os municípios de Januária, Itacarambi e São João das Missões, na região norte de Minas Gerais.");
     }
 
     // Métodos relacionados aos menus
@@ -195,8 +271,9 @@ public class Projeto_Guia_Turistico {
         System.out.print("Opção:");
     }
 
-    private static void menuCadastro(int id, String path, String caminhoCadastro, String caminhoReserva, int idR) {
+    private static void menuCadastroUsuario(int id, String path, String caminhoCadastro, String caminhoReserva, int idR) {
         id = inicializarGeral(caminhoCadastro);
+
         Scanner ler = new Scanner(System.in);
         int opcao = 0;
 
@@ -212,13 +289,12 @@ public class Projeto_Guia_Turistico {
 
             switch (opcao) {
                 case 1:
-                    if (cadastrarUsuario(id, caminhoCadastro)) {
+                    if (    cadastrarUsuario(id, caminhoCadastro)) {
                         id++;
                         gravarId(id, "id.txt");
                     }
                     break;
                 case 2:
-                    id = 0;
                     loginUsuario(caminhoCadastro, id, caminhoReserva, idR);
                     break;
                 case 3:
@@ -232,6 +308,7 @@ public class Projeto_Guia_Turistico {
 
     private static void menuAdmin(int id, String caminhoCadastro, int idR) {
         id = inicializarGeral(caminhoCadastro);
+        idR = inicializarReservas("clientes/reservas/");
         Scanner ler = new Scanner(System.in);
         int opcao = 0;
         while (opcao != 4) {
@@ -270,72 +347,9 @@ public class Projeto_Guia_Turistico {
         }
     }
 
-    // Outros métodos
-    private static boolean loginUsuario(String caminhoCadastro, int id, String caminhoReserva, int idR) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Informe o seu e-mail: ");
-        String email = sc.nextLine();
-        System.out.println("Informe a sua senha: ");
-        String senha = sc.nextLine();
-
-        File diretorio = new File(caminhoCadastro);
-        File[] arquivos = diretorio.listFiles();
-
-        if (arquivos != null) {
-            for (File arquivo : arquivos) {
-                try {
-                    BufferedReader bf = new BufferedReader(new FileReader(arquivo));
-                    String linha;
-                    String emailArquivo = "";
-                    String senhaArquivo = "";
-                    while ((linha = bf.readLine()) != null) {
-                        if (linha.contains("Email do Usuario: ")) {
-                            emailArquivo = linha.replace("Email do Usuario: ", "");
-                        }
-                        if (linha.contains("Senha do Usuario: ")) {
-                            senhaArquivo = linha.replace("Senha do Usuario: ", "");
-                        }
-                    }
-                    if (email.equals(emailArquivo) && senha.equals(senhaArquivo)) {
-                        System.out.println("Login realizado com sucesso!");
-                        menuUsuario(id, caminhoReserva, idR);
-                        return true;
-                    }
-                    bf.close();
-                } catch (IOException e) {
-                    System.err.println("Erro ao ler o arquivo");
-                    e.printStackTrace();
-                }
-            }
-        }
-        System.out.println("E-mail ou senha incorretos!");
-        return false;
-    }
-
-
-    private static void validarAdmin(int id, String caminhoReserva, int idR) {
-        Scanner ler = new Scanner(System.in);
-        Administrador senhaAdm = new Administrador();
-        System.out.println("Informe a senha do Administrador");
-        int senha = ler.nextInt();
-
-        if (senha == senhaAdm.senhaAdmin) {
-            menuAdmin(id, caminhoReserva, idR);
-        } else {
-            System.out.println("Senha incorreta");
-        }
-    }
-
-    private static void confimarReserva() {
-        // Implementar método de confirmação de reserva
-    }
-
-    private static void verificarPasseio() {
-        // Implementar método de verificação de reserva
-    }
-
     private static void menuUsuario(int id, String caminhoReserva, int idR) {
         Scanner ler = new Scanner(System.in);
+        idR = inicializarReservas("clientes/reservas/");
         int opcao = 0;
         while (opcao != 4) {
             System.out.println("\n|----------------------|");
@@ -353,8 +367,6 @@ public class Projeto_Guia_Turistico {
                     informacaoSobreParque();
                     break;
                 case 2:
-                    System.out.println("Qual o ID do Usuario: ");
-                    id = ler.nextInt();
                     if (reservaPasseio(id, caminhoReserva, idR)) {
                         idR++;
                         gravarId(idR, "idR.txt");
@@ -372,17 +384,4 @@ public class Projeto_Guia_Turistico {
             }
         }
     }
-
-    private static void cancelarReserva() {
-    }
-
-    private static void informacaoSobreParque() {
-        System.out.println("\n|-------------------------|");
-        System.out.println("  CAVERNAS DO PERUAÇU");
-        System.out.println("|---------------------------|\n");
-        System.out.println("O Parque Nacional Cavernas do Peruaçu é um local onde belas paisagens são emolduradas pela arte rupestre pré-histórica, em sítios arqueológicos milenares de importância internacional e suas cavernas de grandeza colossal.\n" +
-                "\n" +
-                "A Unidade de Conservação foi criada em 1999, e possui uma área de 56.448 hectares, que compreende os municípios de Januária, Itacarambi e São João das Missões, na região norte de Minas Gerais.");
-    }
-
 }
