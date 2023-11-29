@@ -272,7 +272,7 @@ public class Projeto_Guia_Turistico {
     }
 
     private static void menuCadastroUsuario(int id, String path, String caminhoCadastro, String caminhoReserva, int idR) {
-        id = inicializarGeral(caminhoCadastro);
+        //id = inicializarGeral(caminhoCadastro);
 
         Scanner ler = new Scanner(System.in);
         int opcao = 0;
@@ -295,6 +295,7 @@ public class Projeto_Guia_Turistico {
                     }
                     break;
                 case 2:
+                        //ateção aqui
                     loginUsuario(caminhoCadastro, id, caminhoReserva, idR);
                     break;
                 case 3:
