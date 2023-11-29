@@ -29,6 +29,165 @@ public class Projeto_Guia_Turistico {
                 System.out.println("Opção Inválida!");
         }
     }
+    private static void menuCadastroUsuario(int id, String path, String caminhoCadastro, String caminhoReserva, int idR) {
+        id = inicializarGeral(caminhoCadastro);
+
+        Scanner ler = new Scanner(System.in);
+        int opcao = 0;
+
+        while (opcao != 3) {
+            System.out.println("\n|-------------------------|");
+            System.out.println("  Cadastramento ou Login ");
+            System.out.println("|---------------------------|\n");
+            System.out.println(" 1 - Cadastrar Usuário ");
+            System.out.println(" 2 - Fazer Login ");
+            System.out.println(" 3 - Sair ");
+            System.out.print("\n Opção: ");
+            opcao = ler.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    if (    cadastrarUsuario(id, caminhoCadastro)) {
+                        id++;
+                        gravarId(id, "id.txt");
+                    }
+                    break;
+                case 2:
+                    //ateção aqui
+                    loginUsuario(caminhoCadastro, id, caminhoReserva, idR);
+                    break;
+                case 3:
+                    System.out.println("Saindo...");
+                    break;
+                default:
+                    System.out.println("Opção Inválida!");
+            }
+        }
+    }
+    private static void validarAdmin(int id, String caminhoReserva, int idR) {
+        Scanner ler = new Scanner(System.in);
+        Administrador senhaAdm = new Administrador();
+        System.out.println("Informe a senha do Administrador");
+        int senha = ler.nextInt();
+
+        if (senha == senhaAdm.senhaAdmin) {
+            menuAdmin(id, caminhoReserva, idR);
+        } else {
+            System.out.println("Senha incorreta");
+        }
+    }
+    private static void menuAdmin(int id, String caminhoCadastro, int idR) {
+        id = inicializarGeral(caminhoCadastro);
+        idR = inicializarReservas("clientes/reservas/");
+        Scanner ler = new Scanner(System.in);
+        int opcao = 0;
+        while (opcao != 4) {
+            System.out.println("\n|----------------------|");
+            System.out.println("  Cavernas do Peruaçu  ");
+            System.out.println("|----------------------|\n");
+            System.out.println(" 1 - Fazer Reserva para Usuario ");
+            System.out.println(" 2 - Verificar Reserva para Usuario");
+            System.out.println(" 3 - Confirmar Reserva");
+            System.out.println(" 4 - Sair ");
+            System.out.print("\n Opção: ");
+            opcao = ler.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    System.out.println("Qual o ID do Usuario: ");
+                    id = ler.nextInt();
+                    if (reservaPasseio(id, caminhoCadastro, idR)) {
+                        idR++;
+                        gravarId(idR, "idR.txt");
+                    }
+                    break;
+                case 2:
+                    verificarPasseio();
+                    break;
+                case 3:
+                    confimarReserva();
+                    break;
+                case 4:
+                    System.out.println("Saindo...");
+                    break;
+                default:
+                    System.out.println("Opção Inválida!");
+                    break;
+            }
+        }
+    }
+    private static boolean reservaPasseio(int id, String caminhoReserva, int idR) {
+        Scanner sc = new Scanner(System.in);
+        Reserva c = new Reserva();
+        System.out.println("|-------------------|");
+        System.out.println(" Reservando Passeio ");
+        System.out.println("|-------------------|\n");
+        System.out.print("Nome: ");
+        c.nome = sc.nextLine();
+        System.out.print("Contato: ");
+        c.contato = sc.nextLine();
+        System.out.print("Adultos: ");
+        c.adultos = sc.nextInt();
+        System.out.print("Crianças: ");
+        c.criancas = sc.nextInt();
+        System.out.println("|-------------------|");
+        System.out.println(" Opções de Passeio ");
+        System.out.println("|-------------------|\n");
+        System.out.println("1 - Todo o Percurso");
+        System.out.println("2 - Meio Percurso");
+        System.out.print("opção: ");
+        c.pacote = sc.nextInt();
+        c.id = id;
+        c.idR = idR;
+
+        try {
+            gravarReserva(c, caminhoReserva, c.id, c.idR); // Chamada atualizada
+        } catch (FileNotFoundException e) {
+            System.out.println("Não foi possível fazer Reserva: ");
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    private static boolean cadastrarUsuario(int id, String path) {
+
+        Scanner sc = new Scanner(System.in);
+        Clientes cl = new Clientes();
+
+        System.out.println("|-----------|");
+        System.out.println("  Cadastrar  ");
+        System.out.println("|-----------|\n");
+        System.out.print("E-mail: ");
+        cl.email = sc.nextLine();
+        System.out.print("Senha: ");
+        cl.senha = sc.nextLine();
+        cl.id = id;
+        try {
+            gravarCadastroCliente(cl, path);
+        } catch (FileNotFoundException e) {
+            System.out.println("Não foi possível cadastrar");
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    private static void gravarId(int id, String arquivo) {
+        PrintWriter pw;
+        try {
+            pw = new PrintWriter(arquivo);
+            pw.println(id);
+            pw.flush();
+            pw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+    private static void verificarPasseio() {
+        // Implementar método de verificação de reserva
+    }
+    private static void confimarReserva() {
+        // Implementar método de confirmação de reserva
+    }
 
     // Métodos de inicialização
     private static int inicializarGeral(String caminhoReserva) {
@@ -75,18 +234,6 @@ public class Projeto_Guia_Turistico {
         return idR;
     }
 
-    private static void gravarId(int id, String arquivo) {
-        PrintWriter pw;
-        try {
-            pw = new PrintWriter(arquivo);
-            pw.println(id);
-            pw.flush();
-            pw.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
     private static int lerId(String arquivo) {
         BufferedReader bf;
         int id = 0;
@@ -102,28 +249,6 @@ public class Projeto_Guia_Turistico {
     }
 
     // Métodos relacionados ao cadastro de usuários
-    private static boolean cadastrarUsuario(int id, String path) {
-
-        Scanner sc = new Scanner(System.in);
-        Clientes cl = new Clientes();
-
-        System.out.println("|-----------|");
-        System.out.println("  Cadastrar  ");
-        System.out.println("|-----------|\n");
-        System.out.print("E-mail: ");
-        cl.email = sc.nextLine();
-        System.out.print("Senha: ");
-        cl.senha = sc.nextLine();
-        cl.id = id;
-        try {
-            gravarCadastroCliente(cl, path);
-        } catch (FileNotFoundException e) {
-            System.out.println("Não foi possível cadastrar");
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
 
     private static void gravarCadastroCliente(Clientes cl, String path) throws FileNotFoundException {
         PrintWriter pw = new PrintWriter(path + cl.id + ".txt");
@@ -135,8 +260,8 @@ public class Projeto_Guia_Turistico {
     }
 
     // Métodos relacionados à reserva de passeios
-    private static void gravarReserva(Reserva c, String caminhoReserva, int idR) throws FileNotFoundException {
-        PrintWriter pw = new PrintWriter(caminhoReserva + c.id + "_" + idR + ".txt");
+    private static void gravarReserva(Reserva c, String caminhoReserva, int id, int idR) throws FileNotFoundException {
+        PrintWriter pw = new PrintWriter(caminhoReserva + id + "_" + idR + ".txt"); // Ajuste do nome do arquivo
         pw.println("\nDados da Reserva");
         pw.println("Id do Usuario: " + c.id);
         pw.println("Id da Reserva: " + c.idR);
@@ -149,53 +274,7 @@ public class Projeto_Guia_Turistico {
         pw.close();
     }
 
-    private static boolean reservaPasseio(int id, String caminhoReserva, int idR) {
-        Scanner sc = new Scanner(System.in);
-        Reserva c = new Reserva();
-        System.out.println("|-------------------|");
-        System.out.println(" Reservando Passeio ");
-        System.out.println("|-------------------|\n");
-        System.out.print("Nome: ");
-        c.nome = sc.nextLine();
-        System.out.print("Contato: ");
-        c.contato = sc.nextLine();
-        System.out.print("Adultos: ");
-        c.adultos = sc.nextInt();
-        System.out.print("Crianças: ");
-        c.criancas = sc.nextInt();
-        System.out.println("|-------------------|");
-        System.out.println(" Opções de Passeio ");
-        System.out.println("|-------------------|\n");
-        System.out.println("1 - Todo o Percurso");
-        System.out.println("2 - Meio Percurso");
-        System.out.print("opção: ");
-        c.pacote = sc.nextInt();
-        c.id = id;
-        c.idR = idR;
-
-        try {
-            gravarReserva(c, caminhoReserva, idR);
-        } catch (FileNotFoundException e) {
-            System.out.println("Não foi possível fazer Reserva: ");
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
     // Métodos relacionados à validação do administrador
-    private static void validarAdmin(int id, String caminhoReserva, int idR) {
-        Scanner ler = new Scanner(System.in);
-        Administrador senhaAdm = new Administrador();
-        System.out.println("Informe a senha do Administrador");
-        int senha = ler.nextInt();
-
-        if (senha == senhaAdm.senhaAdmin) {
-            menuAdmin(id, caminhoReserva, idR);
-        } else {
-            System.out.println("Senha incorreta");
-        }
-    }
 
     private static boolean loginUsuario(String caminhoCadastro, int id, String caminhoReserva, int idR) {
         Scanner sc = new Scanner(System.in);
@@ -213,19 +292,25 @@ public class Projeto_Guia_Turistico {
                     String linha;
                     String emailArquivo = "";
                     String senhaArquivo = "";
+                    int idUsuario = -1; // Inicializa o ID do usuário como -1
+
                     while ((linha = bf.readLine()) != null) {
                         if (linha.contains("Email do Usuario: ")) {
                             emailArquivo = linha.replace("Email do Usuario: ", "");
-
                         }
                         if (linha.contains("Senha do Usuario: ")) {
                             senhaArquivo = linha.replace("Senha do Usuario: ", "");
                         }
-
+                        if (linha.contains("Id do Usuario: ")) {
+                            idUsuario = Integer.parseInt(linha.replace("Id do Usuario: ", ""));
+                        }
                     }
+
                     if (email.equals(emailArquivo) && senha.equals(senhaArquivo)) {
                         System.out.println("Login realizado com sucesso!");
-                        menuUsuario(id, caminhoReserva, idR);
+
+                        // Aqui, vamos passar os IDs para o menu do usuário
+                        menuUsuario(idUsuario, caminhoReserva, idR);
                         return true;
                     }
                     bf.close();
@@ -234,18 +319,9 @@ public class Projeto_Guia_Turistico {
                     e.printStackTrace();
                 }
             }
-
         }
         System.out.println("E-mail ou senha incorretos!");
         return false;
-    }
-
-    private static void confimarReserva() {
-        // Implementar método de confirmação de reserva
-    }
-
-    private static void verificarPasseio() {
-        // Implementar método de verificação de reserva
     }
 
     private static void cancelarReserva() {
@@ -269,83 +345,6 @@ public class Projeto_Guia_Turistico {
         System.out.println(" 2 - Administrador ");
         System.out.println(" 3 - Encerrar\n");
         System.out.print("Opção:");
-    }
-
-    private static void menuCadastroUsuario(int id, String path, String caminhoCadastro, String caminhoReserva, int idR) {
-        //id = inicializarGeral(caminhoCadastro);
-
-        Scanner ler = new Scanner(System.in);
-        int opcao = 0;
-
-        while (opcao != 3) {
-            System.out.println("\n|-------------------------|");
-            System.out.println("  Cadastramento ou Login ");
-            System.out.println("|---------------------------|\n");
-            System.out.println(" 1 - Cadastrar Usuário ");
-            System.out.println(" 2 - Fazer Login ");
-            System.out.println(" 3 - Sair ");
-            System.out.print("\n Opção: ");
-            opcao = ler.nextInt();
-
-            switch (opcao) {
-                case 1:
-                    if (    cadastrarUsuario(id, caminhoCadastro)) {
-                        id++;
-                        gravarId(id, "id.txt");
-                    }
-                    break;
-                case 2:
-                        //ateção aqui
-                    loginUsuario(caminhoCadastro, id, caminhoReserva, idR);
-                    break;
-                case 3:
-                    System.out.println("Saindo...");
-                    break;
-                default:
-                    System.out.println("Opção Inválida!");
-            }
-        }
-    }
-
-    private static void menuAdmin(int id, String caminhoCadastro, int idR) {
-        id = inicializarGeral(caminhoCadastro);
-        idR = inicializarReservas("clientes/reservas/");
-        Scanner ler = new Scanner(System.in);
-        int opcao = 0;
-        while (opcao != 4) {
-            System.out.println("\n|----------------------|");
-            System.out.println("  Cavernas do Peruaçu  ");
-            System.out.println("|----------------------|\n");
-            System.out.println(" 1 - Fazer Reserva para Usuario ");
-            System.out.println(" 2 - Verificar Reserva para Usuario");
-            System.out.println(" 3 - Confirmar Reserva");
-            System.out.println(" 4 - Sair ");
-            System.out.print("\n Opção: ");
-            opcao = ler.nextInt();
-
-            switch (opcao) {
-                case 1:
-                    System.out.println("Qual o ID do Usuario: ");
-                    id = ler.nextInt();
-                    if (reservaPasseio(id, caminhoCadastro, idR)) {
-                        idR++;
-                        gravarId(idR, "idR.txt");
-                    }
-                    break;
-                case 2:
-                    verificarPasseio();
-                    break;
-                case 3:
-                    confimarReserva();
-                    break;
-                case 4:
-                    System.out.println("Saindo...");
-                    break;
-                default:
-                    System.out.println("Opção Inválida!");
-                    break;
-            }
-        }
     }
 
     private static void menuUsuario(int id, String caminhoReserva, int idR) {
