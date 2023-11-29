@@ -1,8 +1,5 @@
 public class Clientes {
-    int id, data, hora, adultos, criancas;
-    String email, nome;
-    String contato;
+    int id;
+    String email;
     String senha;
-    int senhaAdmim = 1234;
-
 }
