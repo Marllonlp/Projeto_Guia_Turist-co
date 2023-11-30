@@ -29,6 +29,7 @@ public class Projeto_Guia_Turistico {
                 System.out.println("Opção Inválida!");
         }
     }
+
     private static void menuCadastroUsuario(int id, String path, String caminhoCadastro, String caminhoReserva, int idR) {
         id = inicializarGeral(caminhoCadastro);
 
@@ -47,7 +48,7 @@ public class Projeto_Guia_Turistico {
 
             switch (opcao) {
                 case 1:
-                    if (    cadastrarUsuario(id, caminhoCadastro)) {
+                    if (cadastrarUsuario(id, caminhoCadastro)) {
                         id++;
                         gravarId(id, "id.txt");
                     }
@@ -64,6 +65,7 @@ public class Projeto_Guia_Turistico {
             }
         }
     }
+
     private static void validarAdmin(int id, String caminhoReserva, int idR) {
         Scanner ler = new Scanner(System.in);
         Administrador senhaAdm = new Administrador();
@@ -76,6 +78,7 @@ public class Projeto_Guia_Turistico {
             System.out.println("Senha incorreta");
         }
     }
+
     private static void menuAdmin(int id, String caminhoCadastro, int idR) {
         id = inicializarGeral(caminhoCadastro);
         idR = inicializarReservas("clientes/reservas/");
@@ -116,6 +119,7 @@ public class Projeto_Guia_Turistico {
             }
         }
     }
+
     private static boolean reservaPasseio(int id, String caminhoReserva, int idR) {
         Scanner sc = new Scanner(System.in);
         Reserva c = new Reserva();
@@ -149,6 +153,7 @@ public class Projeto_Guia_Turistico {
         }
         return true;
     }
+
     private static boolean cadastrarUsuario(int id, String path) {
 
         Scanner sc = new Scanner(System.in);
@@ -171,6 +176,7 @@ public class Projeto_Guia_Turistico {
         }
         return true;
     }
+
     private static void gravarId(int id, String arquivo) {
         PrintWriter pw;
         try {
@@ -182,9 +188,11 @@ public class Projeto_Guia_Turistico {
             e.printStackTrace();
         }
     }
+
     private static void verificarPasseio() {
         // Implementar método de verificação de reserva
     }
+
     private static void confimarReserva() {
         // Implementar método de confirmação de reserva
     }
@@ -262,14 +270,18 @@ public class Projeto_Guia_Turistico {
     // Métodos relacionados à reserva de passeios
     private static void gravarReserva(Reserva c, String caminhoReserva, int id, int idR) throws FileNotFoundException {
         PrintWriter pw = new PrintWriter(caminhoReserva + id + "_" + idR + ".txt"); // Ajuste do nome do arquivo
+        pw.println("|--------------------|");
+        pw.println("  Dados da Reserva");
+        pw.println("|--------------------|");
+        pw.println("\nId do Usuario: " + c.id);
         pw.println("\nDados da Reserva");
         pw.println("Id do Usuario: " + c.id);
         pw.println("Id da Reserva: " + c.idR);
         pw.println("\nNome: " + c.nome);
-        pw.println("\nContato: " + c.contato);
-        pw.println("\nQuantidade de Adultos: " + c.adultos);
-        pw.println("\nQuantidade de Crianças: " + c.criancas);
-        pw.println("\nPacote escolhido: " + c.pacote);
+        pw.println("Contato: " + c.contato);
+        pw.println("Quantidade de Adultos: " + c.adultos);
+        pw.println("Quantidade de Crianças: " + c.criancas);
+        pw.println("Pacote escolhido: " + c.pacote);
         pw.flush();
         pw.close();
     }
@@ -351,14 +363,15 @@ public class Projeto_Guia_Turistico {
         Scanner ler = new Scanner(System.in);
         idR = inicializarReservas("clientes/reservas/");
         int opcao = 0;
-        while (opcao != 4) {
+        while (opcao != 5) {
             System.out.println("\n|----------------------|");
             System.out.println("  Cavernas do Peruaçu  ");
             System.out.println("|----------------------|\n");
             System.out.println(" 1 - Ver Informações sobre o Parque");
             System.out.println(" 2 - Fazer Reserva");
-            System.out.println(" 3 - Cancelar Reserva");
-            System.out.println(" 4 - Sair ");
+            System.out.println(" 3 - ver Reserva");
+            System.out.println(" 4 - Cancelar Reserva");
+            System.out.println(" 5 - Sair ");
             System.out.print("\n Opção: ");
             opcao = ler.nextInt();
 
@@ -373,15 +386,62 @@ public class Projeto_Guia_Turistico {
                     }
                     break;
                 case 3:
-                    cancelarReserva();
+                    verificarReservas(id, caminhoReserva);
                     break;
                 case 4:
+                    cancelarReserva();
+                    break;
+                case 5:
                     System.out.println("Saindo...");
                     break;
                 default:
                     System.out.println("Opção Inválida!");
                     break;
             }
+        }
+    }
+
+    private static void verificarReservas(int id, String caminhoReserva) {
+        File diretorio = new File(caminhoReserva);
+        File[] arquivos = diretorio.listFiles();
+
+        if (arquivos != null) {
+            boolean reservas = false;
+
+            for (File arquivo : arquivos) {
+                String nomeArquivo = arquivo.getName();
+
+                // Verifica se o arquivo corresponde ao usuário
+                if (nomeArquivo.startsWith(id + "_")) {
+                    reservas = true;
+                    System.out.println("Reserva encontrada:");
+                    // Exibir informações do arquivo da reserva
+                    exibirConteudoArquivo(arquivo);
+                    System.out.println("---------------------");
+                }
+            }
+
+            if (!reservas) {
+                System.out.println("Nenhuma reserva encontrada para este usuário.");
+            }
+        } else {
+            System.out.println("Nenhuma reserva encontrada.");
+        }
+    }
+
+    private static void exibirConteudoArquivo(File arquivo) {
+        try {
+            BufferedReader bf = new BufferedReader(new FileReader(arquivo));
+            String linha;
+
+            while ((linha = bf.readLine()) != null) {
+                System.out.println(linha);
+            }
+
+            bf.close();
+        } catch (IOException e) {
+            System.err.println("Erro ao ler o arquivo da reserva");
+            e.printStackTrace();
         }
     }
 }
